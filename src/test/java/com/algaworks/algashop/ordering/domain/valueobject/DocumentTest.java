@@ -2,15 +2,13 @@ package com.algaworks.algashop.ordering.domain.valueobject;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertWith;
+import static org.assertj.core.api.Assertions.*;
 
 class DocumentTest {
 
     @Test
     void givenInvalidDocumentString_whenTryToCreateDocument_thenExceptionShouldBeThrown() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Document(null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> new Document(null));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Document(""));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Document(" "));
     }

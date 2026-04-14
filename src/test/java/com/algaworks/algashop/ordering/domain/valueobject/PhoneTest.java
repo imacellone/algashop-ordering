@@ -8,7 +8,7 @@ class PhoneTest {
 
     @Test
     void givenInvalidPhone_whenTryToCreatePhone_thenExceptionShouldBeThrown() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Phone(null));
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> new Phone(null));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Phone(" "));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Phone(""));
     }

@@ -2,12 +2,12 @@ package com.algaworks.algashop.ordering.domain.entity;
 
 import com.algaworks.algashop.ordering.domain.exception.CustomerArchivedException;
 import com.algaworks.algashop.ordering.domain.valueobject.*;
+import lombok.Builder;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-import static com.algaworks.algashop.ordering.domain.exception.ErrorMessages.VALIDATION_ERROR_EMAIL_IS_INVALID;
-import static com.algaworks.algashop.ordering.domain.exception.ErrorMessages.VALIDATION_ERROR_FULLNAME_IS_NULL;
+import static com.algaworks.algashop.ordering.domain.exception.ErrorMessages.*;
 
 public class Customer {
 
@@ -22,16 +22,17 @@ public class Customer {
     private OffsetDateTime registeredAt;
     private OffsetDateTime archivedAt;
     private LoyaltyPoints loyaltyPoints;
+    private Address address;
 
-    public Customer(final CustomerId id,
-                    final FullName fullName,
-                    final BirthDate birthDate,
-                    final Email email,
-                    final Phone phone,
-                    final Document document,
-                    final Boolean promotionNotificationsAllowed,
-                    final OffsetDateTime registeredAt) {
-        this(id,
+    @Builder(builderClassName = "BrandNewCustomerBuilder", builderMethodName = "brandNew")
+    private Customer(final FullName fullName,
+                     final BirthDate birthDate,
+                     final Email email,
+                     final Phone phone,
+                     final Document document,
+                     final Boolean promotionNotificationsAllowed,
+                     final Address address) {
+        this(new CustomerId(),
                 fullName,
                 birthDate,
                 email,
@@ -39,22 +40,25 @@ public class Customer {
                 document,
                 promotionNotificationsAllowed,
                 false,
-                registeredAt,
+                OffsetDateTime.now(),
                 null,
-                LoyaltyPoints.ZERO);
+                LoyaltyPoints.ZERO,
+                address);
     }
 
-    public Customer(final CustomerId id,
-                    final FullName fullName,
-                    final BirthDate birthDate,
-                    final Email email,
-                    final Phone phone,
-                    final Document document,
-                    final Boolean promotionNotificationsAllowed,
-                    final Boolean archived,
-                    final OffsetDateTime registeredAt,
-                    final OffsetDateTime archivedAt,
-                    final LoyaltyPoints loyaltyPoints) {
+    @Builder(builderClassName = "ExistingCustomerBuilder", builderMethodName = "existing")
+    private Customer(final CustomerId id,
+                     final FullName fullName,
+                     final BirthDate birthDate,
+                     final Email email,
+                     final Phone phone,
+                     final Document document,
+                     final Boolean promotionNotificationsAllowed,
+                     final Boolean archived,
+                     final OffsetDateTime registeredAt,
+                     final OffsetDateTime archivedAt,
+                     final LoyaltyPoints loyaltyPoints,
+                     final Address address) {
         setId(id);
         setFullName(fullName);
         setBirthDate(birthDate);
@@ -66,6 +70,7 @@ public class Customer {
         setRegisteredAt(registeredAt);
         setArchivedAt(archivedAt);
         setLoyaltyPoints(loyaltyPoints);
+        setAddress(address);
     }
 
     public void addLoyaltyPoint(final LoyaltyPoints addPointsAmount) {
@@ -84,6 +89,7 @@ public class Customer {
         this.setEmail(Email.generateAnonymizedEmailBy(this.id.value()));
         this.setBirthDate(null);
         this.setPromotionNotificationsAllowed(false);
+        this.setAddress(Address.ANONYMOUS);
     }
 
     public void enablePromotionNotifications() {
@@ -111,13 +117,17 @@ public class Customer {
         this.setPhone(newPhone);
     }
 
+    public void changeAddress(final Address newAddress) {
+        requireChangeable();
+        this.setAddress(newAddress);
+    }
+
     public CustomerId id() {
         return id;
     }
 
     private void setId(final CustomerId id) {
-        Objects.requireNonNull(id);
-        this.id = id;
+        this.id = Objects.requireNonNull(id);
     }
 
     public FullName fullName() {
@@ -125,8 +135,7 @@ public class Customer {
     }
 
     private void setFullName(final FullName fullName) {
-        this.fullName = Objects.requireNonNull(fullName, VALIDATION_ERROR_FULLNAME_IS_NULL);
-        ;
+        this.fullName = Objects.requireNonNull(fullName, VALIDATION_ERROR_FULL_NAME_IS_NULL);
     }
 
     public BirthDate birthDate() {
@@ -153,8 +162,7 @@ public class Customer {
     }
 
     private void setPhone(final Phone phone) {
-        Objects.requireNonNull(phone);
-        this.phone = phone;
+        this.phone = Objects.requireNonNull(phone, VALIDATION_ERROR_INVALID_PHONE);
     }
 
     public Document document() {
@@ -162,8 +170,7 @@ public class Customer {
     }
 
     private void setDocument(final Document document) {
-        Objects.requireNonNull(document);
-        this.document = document;
+        this.document = Objects.requireNonNull(document, VALIDATION_ERROR_INVALID_DOCUMENT);
     }
 
     public Boolean isPromotionNotificationsAllowed() {
@@ -171,8 +178,7 @@ public class Customer {
     }
 
     private void setPromotionNotificationsAllowed(final Boolean promotionNotificationsAllowed) {
-        Objects.requireNonNull(promotionNotificationsAllowed);
-        this.promotionNotificationsAllowed = promotionNotificationsAllowed;
+        this.promotionNotificationsAllowed = Objects.requireNonNull(promotionNotificationsAllowed);
     }
 
     public Boolean isArchived() {
@@ -180,8 +186,7 @@ public class Customer {
     }
 
     private void setArchived(final Boolean archived) {
-        Objects.requireNonNull(archived);
-        this.archived = archived;
+        this.archived = Objects.requireNonNull(archived);
     }
 
     public OffsetDateTime registeredAt() {
@@ -189,8 +194,7 @@ public class Customer {
     }
 
     private void setRegisteredAt(final OffsetDateTime registeredAt) {
-        Objects.requireNonNull(registeredAt);
-        this.registeredAt = registeredAt;
+        this.registeredAt = Objects.requireNonNull(registeredAt);
     }
 
     public OffsetDateTime archivedAt() {
@@ -207,6 +211,14 @@ public class Customer {
 
     private void setLoyaltyPoints(final LoyaltyPoints loyaltyPoints) {
         this.loyaltyPoints = Objects.requireNonNull(loyaltyPoints);
+    }
+
+    public Address address() {
+        return address;
+    }
+
+    private void setAddress(Address address) {
+        this.address = Objects.requireNonNull(address, VALIDATION_ERROR_INVALID_ADDRESS);
     }
 
     private void requireChangeable() {
