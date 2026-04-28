@@ -28,6 +28,8 @@ public class ErrorMessages {
 
     public static final String ERROR_CUSTOMER_ARCHIVED = "Customer is already archived and cannot be modified";
 
+    public static final String ERROR_ORDER_STATUS_CANNOT_BE_CHANGED = "Cannot change order %s status from %s to %s";
+
     private ErrorMessages() {
     }
 }
