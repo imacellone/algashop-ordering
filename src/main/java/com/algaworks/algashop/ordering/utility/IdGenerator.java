@@ -2,12 +2,14 @@ package com.algaworks.algashop.ordering.utility;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochRandomGenerator;
+import io.hypersistence.tsid.TSID;
 
 import java.util.UUID;
 
 public class IdGenerator {
 
     private static final TimeBasedEpochRandomGenerator timeBasedEpochRandomGenerator = Generators.timeBasedEpochRandomGenerator();
+    private static final TSID.Factory tsidFactory = TSID.Factory.INSTANCE;
 
     private IdGenerator() {
     }
@@ -15,4 +17,14 @@ public class IdGenerator {
     public static UUID generateTimeBasedUUID() {
         return timeBasedEpochRandomGenerator.generate();
     }
+
+    /**
+     * These environment variables must be set when deployed
+     * TSID_NODE
+     * TSID_NODE_COUNT
+     */
+    public static TSID generateTSID() {
+        return tsidFactory.generate();
+    }
+
 }
